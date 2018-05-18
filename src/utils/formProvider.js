@@ -4,60 +4,90 @@ function formProvider(fields) {
     return function (Comp) {
 
         const initialFormState = {};
-        for(const key in fields) {
+        for (const key in fields) {
             initialFormState[key] = {
-                value:fields[key].defaultValue,
-                error:''
+                value: fields[key].defaultValue,
+                error: ''
             };
         }
 
-        class FormComponent extends React.Component{
+        class FormComponent extends React.Component {
             constructor(props) {
                 super(props);
                 this.state = {
-                    form:initialFormState,
-                    formValid:false
+                    form: initialFormState,
+                    formValid: false
                 };
 
-                this.valueChange = his.valueChange.bind(this);
+                this.valueChange = this.valueChange.bind(this);
+                this.setFormValues = this.setFormValues.bind(this);
             }
 
-            valueChange(filedName,value){
-                const {form} = this.state;
+            setFormValues(values) {
+                if (!values) {
+                    return;
+                }
+                const { form } = this.state;
+                let newForm = { ...form };
+                for (const field in form) {
+                    if (form.hasOwnProperty(field)) {
+                        if (typeof values[field] != 'undefined') {
+                            newForm = { ...newForm[field], value: values[field] };
+                        }
+                        newForm[field].valid = true;
+                    }
+                }
+                this.setState({
+                    form: newForm
+                });
+            }
 
-                const newFieldState = {value, valid:true,error:''};
+            valueChange(e) {
+                const { form } = this.state;
 
-                const fieldRules = field[fieldName].rules;
+                let { name, value } = e.target;
 
-                for(let i = 0;i<fieldRules.length;i++){
-                    const {pattern, error} = fieldRules[i];
+                const newFieldState = { value, valid: true, error: '' };
+
+                const fieldRules = fields[name].rules;
+
+                for (let i = 0; i < fieldRules.length; i++) {
+                    const { pattern, error } = fieldRules[i];
                     let valid = false;
 
-                    if(typeof pattern === "function") {
+                    if (typeof pattern === "function") {
                         valid = pattern(value);
                     } else {
                         valid = pattern.test(value);
                     }
 
-                    if(!valid) {
+                    if (!valid) {
                         newFieldState.valid = false;
                         newFieldState.error = error;
                         break;
                     }
                 }
 
-                const newForm = {...form, [filedName]:newFieldState};
+                const newForm = { ...form, [name]: newFieldState };
                 const formValid = Object.values(newForm).every(f => f.valid);
 
                 this.setState({
-                    form:newForm,
+                    form: newForm,
                     formValid
                 });
             }
 
-            render(){
-                const {form, formValid} = this.state;
-                return <Comp {...this.props} form={form} formValid={formValid} onFormChange={this.valueChange}/>
+            render() {
+                const { form, formValid } = this.state;
+                return (
+                    <Comp
+                        {...this.props}
+                        form={form}
+                        setFormValues={this.setFormValues}
+                        formValid={formValid}
+                        onFormChange={this.valueChange}
+                    />
+                );
             }
         }
 

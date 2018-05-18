@@ -1,92 +1,23 @@
 import React from 'react';
+import formProvider from '../utils/formProvider';
+import FormItem from '../components/FormItem'
+import HTTPUtil from '../utils/HTTPUtil';
 
 class UserAdd extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            form: {
-                name: {
-                    valid: false,
-                    value: '',
-                    error: ''
-                },
-                age: {
-                    valid: false,
-                    value: '',
-                    error: ''
-                },
-                gender: {
-                    valid: false,
-                    value: '',
-                    error: ''
-                }
-            }
-        };
-    }
-    valueChange(e, type = "string") {
-        var { name, value } = e.target;
-        if (type === 'number') {
-            value = +value;
-        }
 
-        const { form } = this.state;
-        const newFieldObj = { value, valid: true, error: '' };
-
-        switch (name) {
-            case 'name': {
-                if (value.length > 20) {
-                    newFieldObj.error = "用户名最多20个字符";
-                    newFieldObj.valid = false;
-                } else if (value.length === 0) {
-                    newFieldObj.error = "请输入用户名";
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-            case 'age': {
-                if (value > 100 || value < 0) {
-                    newFieldObj.error = "请输入1~100之间的数字";
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-            case 'name': {
-                if (!value) {
-                    newFieldObj.error = "请选择性别";
-                    newFieldObj.valid = false;
-                }
-                break;
-            }
-        }
-
-
-        this.setState({
-            form: {
-                ...form,
-                [name]: newFieldObj
-            }
-        });
-    }
     submit(e) {
         e.preventDefault();
 
-        const { form: { name, age, gender } } = this.state;
-        if(!name.valid || !age.valid || !gender.valid){
+        const { form: { name, age, gender }, formValid } = this.props;
+        if (!formValid) {
             alert('请填写正确的信息后重试!');
             return;
         }
-        fetch('http://localhost:3010/user', {
-            method: 'post',
-            body: JSON.stringify({
-                name:name.value,
-                age:age.value,
-                gender:gender.value
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((res) => res.json())
+        HTTPUtil.post('/user', JSON.stringify({
+            name: name.value,
+            age: age.value,
+            gender: gender.value
+        }))
             .then((res) => {
                 if (res.id) {
                     alert('添加用户成功');
@@ -103,37 +34,68 @@ class UserAdd extends React.Component {
     }
 
     render() {
-        const { form: { name, age, gender } } = this.state;
+        const { form: { name, age, gender }, onFormChange } = this.props;
         return (
-            <div>
-                <header>
-                    <h1>添加用户</h1>
-                </header>
-                <main>
-                    <form onSubmit={(e) => this.submit(e)}>
-                        <label>用户名:</label>
-                        <input type="text" name="name" value={name.value} onChange={(e) => this.valueChange(e)} />
-                        {!name.valid&&<span>{name.error}</span>}
-                        <br />
-                        <label>年龄:</label>
-                        <input type="text" name="age" value={age.value || ''} onChange={(e) => this.valueChange(e, 'number')} />
-                        {!age.valid&&<span>{age.error}</span>}
-                        <br />
-                        <label>性别:</label>
-                        <select name="gender" value={gender.value} onChange={(e) => this.valueChange(e)}>
-                            <option value="">请选择</option>
-                            <option value="male">男</option>
-                            <option value="female">女</option>
-                        </select>
-                        {!gender.valid&&<span>{gender.error}</span>}
-                        <br />
-                        <br />
-                        <input type="submit" value="提交" />
-                    </form>
-                </main>
-            </div>
+            <form onSubmit={(e) => this.submit(e)}>
+                <FormItem label="用户名:" valid={name.valid} error={name.error}>
+                    <input type="text" name="name" value={name.value} onChange={(e) => onFormChange(e)} />
+                </FormItem>
+                <FormItem label="年龄:" valid={age.valid} error={age.error}>
+                    <input type="text" name="age" value={age.value || ''} onChange={(e) => onFormChange(e)} />
+                </FormItem>
+                <FormItem label="性别:" valid={gender.valid} error={gender.error}>
+                    <select name="gender" value={gender.value} onChange={(e) => onFormChange(e)}>
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </FormItem>
+                <br />
+                <br />
+                <input type="submit" value="提交" />
+            </form>
         )
     }
 }
+
+UserAdd = formProvider({
+    name: {
+        defaultValue: '',
+        rules: [
+            {
+                pattern: function (value) {
+                    return value.length > 0;
+                },
+                error: '请输入用户名'
+            },
+            {
+                pattern: /^.{1,4}$/,
+                error: '用户名最多4个字符'
+            }
+        ]
+    },
+    age: {
+        defaultValue: '',
+        rules: [
+            {
+                pattern: function (value) {
+                    return value >= 1 && value <= 100;
+                },
+                error: '年龄必须在1-100范围内'
+            }
+        ]
+    },
+    gender: {
+        defaultValue: '',
+        rules: [
+            {
+                pattern: function (value) {
+                    return !!value;
+                },
+                error: '请选择性别'
+            }
+        ]
+    }
+})(UserAdd);
 
 export default UserAdd;
