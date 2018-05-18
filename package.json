@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "cd server && json-server db.json -w -p 3000",
-    "dev": "roadhog server"
+    "server": "cd server && json-server db.json -w -p 3010",
+    "dev": "roadhog server",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
   "author": "ming.zhang",
   "license": "ISC",
