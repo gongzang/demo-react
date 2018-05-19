@@ -76,6 +76,36 @@ HTTPUtil.post = function (url, formData, headers = defaultHeaders) {
     })
 }
 /**  
+ * 基于 fetch 封装的 put请求  FormData 表单数据  
+ * @param url  
+ * @param formData    
+ * @param headers  
+ * @returns {Promise}  
+ */
+HTTPUtil.put = function (url, formData, headers = defaultHeaders) {
+    url = urlHead + url;
+    return new Promise(function (resolve, reject) {
+        fetch(url, {
+            method: 'PUT',
+            headers: headers,
+            body: formData
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    reject({ status: response.status })
+                }
+            })
+            .then((response) => {
+                resolve(response);
+            })
+            .catch((err) => {
+                reject({ status: -1 });
+            })
+    })
+}
+/**  
  * 基于 fetch 封装的 DELETE请求  
  * @param url  
  * @param id    

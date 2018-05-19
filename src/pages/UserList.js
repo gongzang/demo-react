@@ -1,5 +1,6 @@
 import React from 'react';
 import HTTPUtil from '../utils/HTTPUtil';
+import PropTypes from 'prop-types';
 
 class UserList extends React.Component {
     constructor(props) {
@@ -17,23 +18,23 @@ class UserList extends React.Component {
                 });
             });
     }
-    edit(user){
-
+    edit(user) {
+        this.props.history.push('/user/edit/' + user.id);
     }
-    delete(user){
+    delete(user) {
         const confirmed = window.confirm(`确定要删除用户 ${user.name} 吗？`);
-        if(confirmed) {
-            HTTPUtil.delete('/user',user.id)
-            .then(res =>{
-                this.setState({
-                    userList:this.state.userList.filter(item=>item.id !== user.id)
+        if (confirmed) {
+            HTTPUtil.delete('/user', user.id)
+                .then(res => {
+                    this.setState({
+                        userList: this.state.userList.filter(item => item.id !== user.id)
+                    });
+                    alert('删除用户成功');
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('删除用户失败');
                 });
-                alert('删除用户成功');
-            })
-            .catch(err=>{
-                console.error(err);
-                alert('删除用户失败');
-            });
         }
     }
     render() {
@@ -72,6 +73,10 @@ class UserList extends React.Component {
             </table>
         )
     }
+}
+
+UserList.contextTypes = {
+    router:PropTypes.object.isRequired
 }
 
 export default UserList;

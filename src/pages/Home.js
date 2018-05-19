@@ -6,7 +6,12 @@ class Home extends React.Component {
         return (
             <div>
                 <Link to="/user/add">添加用户</Link>
+                <br />
                 <Link to="/user/list">用户列表</Link>
+                <br />
+                <Link to="/bill/add">添加账单</Link>
+                <br />
+                <Link to="/bill/list">账单列表</Link>
             </div>
         );
     }

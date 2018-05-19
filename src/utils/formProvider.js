@@ -32,7 +32,7 @@ function formProvider(fields) {
                 for (const field in form) {
                     if (form.hasOwnProperty(field)) {
                         if (typeof values[field] != 'undefined') {
-                            newForm = { ...newForm[field], value: values[field] };
+                            newForm[field] = { ...newForm[field], value: values[field] };
                         }
                         newForm[field].valid = true;
                     }
