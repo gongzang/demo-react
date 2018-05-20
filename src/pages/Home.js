@@ -12,6 +12,8 @@ class Home extends React.Component {
                 <Link to="/bill/add">添加账单</Link>
                 <br />
                 <Link to="/bill/list">账单列表</Link>
+                <br />
+                <Link to="/book/add">添加图书</Link>
             </div>
         );
     }
