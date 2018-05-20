@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title><%=htmlWebpackPlugin.options.title%></title>
+    <script type="text/javascript" src="<%=htmlWebpackPlugin.files.chunks.main.entry%>"></script>
+</head>
+<body>
+<div>
+    :<=JSON.stringify(htmlWebpackPlugin.files[key])>
+    <input type="text">
+    <% for(var key in htmlWebpackPlugin.options){%>
+        <%=key %>:<%=JSON.stringify(htmlWebpackPlugin.options[key])%>
+    <%}%>
+
+    <% for(var key in htmlWebpackPlugin.files){%>
+    <%=key %>:<%=JSON.stringify(htmlWebpackPlugin.files[key])%>
+    <%}%>
+    <script type="text/javascript" src="<%=htmlWebpackPlugin.files.chunks.a.entry%>"></script>
+</div>
+</body>
+</html>
